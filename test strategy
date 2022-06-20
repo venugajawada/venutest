@@ -1,0 +1,186 @@
+Data Test Strategy
+Skip to end of metadata
+•	Created by Wickramasinghe, D. (Dilki), last modified by Vurumalla, S. (Samrat) on May 06, 2022
+Go to start of metadata
+The purpose of this Test Strategy is to define the overall  test approach, test artifacts, test activities and test governance for Data (Radar and ODI) initiatives. The focus is to provide testing best practices and guidelines and not all items in this strategy will apply to all Data initiatives.
+SAS, BO and Tableau application testing is not part of delivery testing.  These are self service applications hence testing is conducted by BICC and/or Business users as it requires a specialized skill.
+Applications in Scope for this test strategy;
+RADAR  - (Reporting  Analytic  Data  And  Reference)  is  ING  Direct  Australia’s  enterprise  wide  data warehouse and acts as a single source of truth for all reporting and analysis.  Data from ING’s various operational systems and external sources is loaded daily into the data warehouse and is provided to the business through RADAR for analysis.
+ODI - (Operational Data Integration) is ING Australia’s middleware system that is predominantly used to Extract, Transform and Load data from numerous source systems to the target systems to satisfy business needs.
+ABG – Australian Business Glossary in Information Governance Catalog (IGC).The Australia Business Glossary holds Business Terms we commonly use every day and is described in Australian business language.  It is the source of truth for all ING Australia definitions.
+Test Approach & Governance
+-  This test approach conforms to agile testing practices and tech delivery test strategy which includes ING minimum testing standards.
+Functional/Regression Testing
+-  Test scope to be agreed by PO/Developer/Tester for each story before development/testing commences. It's a best practice to Include 3 amigos agile practice to each story.
+-  Testing scope should be well planned and well defined. Ideally the testing scope should have a direct correlation to acceptance criteria in the user stories (or as defined in the requirement specification and/or ETL Design/Mapping specifications). Acceptance criteria in each user story will be further refined to be used as test conditions/test cases.  
+-  Test cases should be present in MTM/TFS covering acceptance criteria with a reference to the tfs user story (PBI) . In the situation where PBI/acceptance criteria is not present in TFS, the test case should reference the artifact which it does. This is to keep the traceability with the requirement and testing scope.
+-  Test cases can be written in a high level or in the form of BDD. If a test case is marked to be a regression test, it should contain additional information to make it more understandable for anyone in the team.
+-  Test cases should be prioritized and automation status updated by the completion of the initiative.
+-  Automated Testing will be a core activity in all stages of development.  Manual testing will be utilized where test automation delivers no return on investment or no capability of testing exists
+-  Each Automated Test scripts should include the corresponding MTM test case id to maintain traceability.
+-  Each Automated Test scripts should include the applicable @tags to identify the initiative and regression status. Additional tags can be added if required.
+New Application Testing - Any new application that is being introduced/upgraded to Data Tribe's asset list will be tested for “LDAP's unauthenticated bind feature“. This is to  verify that blank/empty passwords are being rejected explicitly in manual login functionality of the said application. 
+
+RADAR Testing
+-  Data warehouse functional testing should be performed in every stage in the development process. On a high level this includes;
+•	Source systems/files to Staging ( note - it is assumed that data that's being sent to RADAR in files have been tested for their validity by the front end test teams or ODI test teams.)
+•	Staging to DDW
+•	DDW to DM
+•	DM/EXT/EI Explorer/Esperanto to output files
+-  Functional testing should include following testing types where relevant 
+•	Metadata testing ( e.g Table/Column naming conventions, Data types, Data length checks)
+•	Make sure that data is transformed correctly according to various business requirements and rules. Testing should cover row and column level in each tables
+•	Make sure that the count of records loaded in the target is matching with the expected count from source.
+•	Make sure all data quality rules defined in ABG are tested for their validity in target systems/Files.
+•	Make sure keys configured to be auto-generated in data warehouse are created properly in target system
+•	Verify Null fields
+•	Verify no duplicity of data in the target system
+•	Make sure that all projected data is loaded into the data warehouse without any data loss and truncation.(i.e Source file to STG, STG to DDW and DDW to DM, DM to EXT, STG to EI EXPLORER, DM to Esperanto)
+•	Make sure rejected data is in proper error tables with all details
+•	Historical data testing where needed    
+•	Data Governance Testing (DMMS Testing)          
+- RADAR best practices and general guidelines for validating Dimensions facts and error tables are available in Wiki
+- RADAR Functional Testing has been broken down to following categories in MTM/TFS and RADAR test automation framework to optimize testing scope, maintain consistency and clarity. It is expected that each squad will adhere to this standard.
+•	Data Management Minimum Standards Testing
+•	Metadata Tests
+•	Data Quality Tests
+•	Data Transformation Tests
+•	Data Completeness Tests
+•	Data Priming Tests
+•	Regression Tests
+•	DMMS Tests
+Different test types applicable to Data Testing are described below. Not all test types will apply to all tribe initiatives. This is to be used as a guidance to understand the testing scope;
+ 
+ 
+Data Management Minimum Standards Testing
+-  Testing for IGC terms needs to be completed as per the DMMS test strategy defined in the diagram above.
+-  DMMS testing needs to be covered for Business Functional, Technical Functional and PVT. 
+-  DMMS Business Functional testing need to completed as per the guidelines provided in the sample test cases in TFS. DMMS - Business Functional Test Cases.msg
+-  Data Quality rules defined in IGC terms need to be tested for it's validity where applicable (i.e when a valid set of data  is available in UAT and/or Production, the rules needs to be verified against the said environment)
+-  SQL queries written for TIDY framework need to be tested for it's validity against the actual DQ rule defined in ABG
+-  Any deviations to the DQ rules found in production/UAT data needs to be socialized and discussed with the PO/DDOs to refine the said DQ rule or raise an incident/PRB to get the issue rectified
+-  Test cases and test evidence needs to be available in TFS/MTM for all parts of DMMS testing 
+-  Test cases and test evidence needs to be available for TIDY SQL testing
+-  Any DQ issues identified during TIDY testing needs to be socialised with the DDO and PO before a sign off is provided. Preferably a backlog item/userstory should be added to address as a separate task.
+-  Data Lineage checklist needs to be filled and uploaded to the git repository as per the guidelines provided in this page 
+ -  Formal sign off needs to be provided for DMMS testing ( including TIDY query testing) to the relevant stakeholders 
+
+**DMMS requires all data to be governed at point of injection (i.e STG) and Data derived in RADAR is governed in DM. 
+ODI Testing 
+-  It is expected all teams who are working on any ODI changes will make use of the ODI test framework and add regression test scripts to the same. ODI framework uses SQL queries to verify data between source to target similar to RADAR framework. 
+	Details on how to set up and add test cases to the ODI test automation framework can be found here.    
+	Details on updates to ODI framework due to data anonymisation can be found here
+	 -  Following list has the scope of testing expected for any DATA target files. Not all of them may be applicable to all the files. Testers need to discuss with their team, prioritise  and test the appropriate level.
+ For target file validations you need to make sure ;
+-         Target file names match the naming conventions requested by the specification
+-         Check the file format is as per the specification – (i.e file type, delimiter type, file extension, no of fields…etc)
+-         Header/Footer format (if any) as per the specification 
+-         Header/Footer information match as per the specification 
+-         Content on each field/row maps to the specification
+-         Row count in the target file match with the source
+-         Test that field types as per the specification
+-         Test that field lengths are as per the specification
+-         Check number formatting for numeric or currency values.
+-         Test sorting is correct if sort has been done in the target file
+-         Compare source to target file to make sure the correct information is being populated in the target file
+-         Test all transformation logics/business rules that applied to the target file ( separate test case is needed for each transformation to make sure you don’t miss any logics)
+-         Use different data to produce the target files and test for unique values/ nulls
+-         Check for Date Formats
+-         Check for invalid values for different fields – check the behavior when invalid values are sent to the target system. This may be subject to the field)
+-         Test fields with special characters
+-         Test the hand back/trigger files if applicable
+-         Test for any scenarios applicable for error handling
+Regression Testing
+-  Project regression should be done based on the impact analysis provided by the developers or SMEs. Project regression testing will not be a separate activity, it's embedded into functional testing scope and need to be completed before test sign off is provided. Not all initiatives will have project regression.
+-  Release regression with the use of the automation regression suite can be carried out for production releases for large projects which have impact to many Informatica mappings which are critical.
+-  ODI project regression should be carried out in the tribe's biab test region. ODI release regression should be done in DM/RC environment if the change is part of a vNext release, otherwise in tribe's biab test region.
+-  Testers can make the decision with the team whether RADAR release regression is required for a particular change based on the guidelines defined by the test lead and data leads in this page 
+-  RADAR Release regression should be carried out in UAT region as per the process defined and socialized in this link 
+-  It is expected 100% pass rate on all new automated tests added to the regression test framework.
+-  It is expected minimum 90% pass rate on release regression test cases before a change is released to production
+-  It is expected teams will analyse the release regression failures to rule out any functional issues before a change is released to production
+Test Design
+Every initiative/change request/production incident should have a corresponding test case(s) in MTM under InfoDomain or  Tribes project. 
+-  New initiatives can have a new test plan created under InfoDomain/Tribe project in TFS/MTM.
+-  As described above Functional test cases will be documented in TFS/MTM test management tool.
+-  How to configure MTM and design test cases and execute test cases can be found in this document.  
+-  Test cases should be precise, easy to understand and clearly describe the functionality being tested.
+•	Guidelines for test case writing can be  found in this document.  . All teams are expected to adhere to these guidelines.
+-  Test cases should cover all the acceptance criteria in user stories/RADAR/DATA design documents and will have a clear pass / fail criteria
+-  Test Cases and Defects(if applicable)  should be linked to the user story via Links tab in TFS/MTM using the following conventions: The links help to show the traceability between User stories, Test Cases and Defects in tfs story board and give a clear indication of remaining work for the sprint.
+Test Case ----- Tests ---> PBI/User Story
+PBI/User Story ----- Tested By  ---> Test Case
+•	 Refer to this document to learn how to link test cases and bugs to requirements   -  Test Cases need to have the Automation Status field in the test case updated clearly to indicate the automation status of the test case. Refer to 
+•	Test Evidence
+-  Test evidence for functional test cases should be attached to the test cases.  However if the test evidence contains sensitive customer information, include the sql query or screenshot with sensitive information masked.
+-  Test evidence with sensitive information ( i.e account balances or personal details of the customer) can also be stored in the project folder.
+-  Test evidence need to be clear and concise for audit purposes
+-  Test evidence for regression is in the test automation dashboard and it is not mandatory to have the results in tfs for test sign off. Single Test case can be created for the release with the release date and executed with the test evidence from test automation dashboard.
+Test Automation
+-  ING RADAR test automation solution should be used for all RADAR related test automation.
+	Following links have information on how to use RADAR test automation framework 
+-  ODI  test automation solution should be used for applicable ODI related test automation. Reference 
+-  It's encouraged to explore new ways of automating RADAR testing with new technologies and tools to improve the efficiency of testing.
+-  BDD testing technique should be used within the automation frameworks to capture the business rules and logic. Ideally the test case ad BDD test scenarios should have a correlation.
+-  BDD test steps/title in test automation should have a clear business requirement/logic defined. i.e Given/When/Then should indicate what is being tested
+-  Automated tests should have the test case ID from TFS/MTM with a clear test title defining what's being tested  
+-  Automated tests should be clearly tagged. 
+-  All regression tests that are automated and merged to RADAR git branch should be included in the overnight test run in the Test Region
+-  Code reviews should be conducted for all test scripts that will be added to the regression test suite. Code review capability in TFS should be used for reviews. When creating a pull request in tfs the reviewer name can be selected for the review. 
+-  Code reviewers should should use the following  guidelines when conducting the code reviews for Data test automation suite.
+Defects Management
+-  If required Defects can be raised in TFS linked to a test case. At the time of writing this test strategy as per Agile principals it's not mandatory for teams to raise sprint level defects, however if the business stakeholders have requested to view the sprint level defects, the teams can capture the same in TFS or  on a wiki page and socialize with the business.
+-   Depending on the nature of the Defect, if the Defects/Issues can be directly linked to the PBI/userstory it needs to linked with the correct link type -  There should not be any Sev 1 or Sev2 outstanding defects at the end of the release
+-   All defects opened for a particular change has to be in closed state or deferred by PO before the story is marked Done. 
+Test Sign offs 
+-  Test sign off mail should be provided by the tester who was responsible for testing the change, when changes are scheduled to go to production. 
+-  Test sign off mail should only be sent  once all the items in the Definition of Done for testing have been completed.
+-  Any RADAR/ODI related change needs to have a Test Signoff mail attached to the CHG in SNOW.
+-  Test sign off mail should have the signature of the person responsible for testing the change
+-  Test sign off mail needs to have the tribe's Test Chapter lead or ML-AU-ID-Test Chapter Leads mailing group copied for CAB and audit requirements
+
+SNOW Change Management 
+-  Test sign off mail needs to be attached to the relevant change in SNOW for CAB and audit requirements
+-  'Testing Field' in SNOW ticket needs have the following text to describe and reflect the change has been successfully tested in Test and/or UAT environments as per the guidelines defined in this test strategy. 
+“The functional testing was successfully conducted as per https://wiki/display/InfoDomain/Data+Test+Strategy in the Dev, Test and UAT/BIAB environments. Furthermore, regression testing was conducted on TEST/UAT/BIAB environment. The testing was against [pick whether testing is applicable to RADAR, ODI or both]. The test evidence and signoff has been attached.”
+- 'Testing Field' in SNOW ticket needs to reflect the change has been successfully tested for RADAR, ODI or both
+Production Verification Testing
+-  PVT to be conducted in production environment  for every code deployment to verify the deployment has been successful.
+-  It is not required for the test team to conduct a full functional test in production env during PVT. PVT Testing scope can be decided by the squad during planning of the implantation.
+-  Teams are encouraged to use the PVT tool to conduct production verification to increase efficiency during PVT - (Tool details can be found here -  RADAR PVT Tool)
+-  It is not required to capture test evidence in the form of screenshots as the purpose of the PVT is to make sure the deployment was successful. Functional verifier can mention in SNOW ticket that verification was successful before closing the SNOW ticket. This can be treated as the evidence of PVT.
+
+Definition of Done for Testing
+Any change that’s going to production need to meet the following criteria so that we know minimum standards for testing have been met before test sign off is provided.
+Story/Sprint Done
+•	Functional Test scenarios/conditions are identified by conducting one or more of the following tasks  
+•	3 amigo's sessions (Developer, Tester, PO)
+•	 Backlog grooming or story refinement sessions
+•	 Business stakeholder sessions
+•	 Data Analysis
+•	 Past test cases/scripts analysis
+•	Test scenarios are identified for existing functionality based on the Impact Analysis done by the development team
+•	Positive and Negative Test cases are available in MTM under each test category (i.e DMMS, Metadata, Transformation, Completeness, Priming, Quality)
+•	Functional and regression tested conducted in Test region for the acceptance criteria
+•	All Functional test cases are linked to the user story in TFS/MTM
+•	All test cases have been passed in MTM by the end of the sprint after testing is completed in Test region
+•	Defects that are identified in Test region are reported in tfs board linked to User Stories/PBIs ( use work item type 'Task' to raise defects with the tag @Bug)
+•	Test results/evidence are available and attached to the test cases or placed in the project folder
+•	All defects that have been identified are fixed and closed. Any outstanding bugs are carried forward to the next sprint or closed based on PO review
+•	Automation scripts are uploaded to the remote feature branch
+Release Done
+•	DMMS Business Functional testing conducted to verify Conceptual and Logical Data Models have been accurately implemented  and published in the Australia  Business Glossary Catalog. This includes the Business Terms and Data Quality Rules
+•	DMMS (Data Management Minimum Standards) Functional testing conducted to verify it's compliant to the design principals (ABG Business Term Design Principles) 
+•	No outstanding defects
+•	@FullRegression Tag is added in feature file to all applicable regression test scenarios
+•	Pull request created to merge the automation code to the master (RADAR) branch
+•	Pull request approved by a Senior Dev/Test engineer
+•	Impact Analysis is attained from the Development Team
+•	Regression testing carried out in UAT region for all major changes based on the Impact Analysis
+•	Verify 100% Regression pass rate for all new tests added to the regression suite.
+•	All regression scripts that were broken due to the change have been fixed and checked into RADAR branch
+•	Functional testing - Test sign off provided for CAB
+•	 Testing field in SNOW is updated to reflect testing was successfully completed
+•	Test cases, test evidence and sign off provided for DMMS testing ( including TIDY query testing) to the relevant stakeholders
+•	 Any outstanding DQ issues needs to be documented ( SR or Backlog item - Process to be confirmed with Niall and DG team)
+
